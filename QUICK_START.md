@@ -4,94 +4,75 @@
 
 ### On Linux/macOS:
 ```bash
-# 1. Create and navigate to project directory
-mkdir zipbomb-evaluator && cd zipbomb-evaluator
+# 1. Clone the repo
+git clone https://github.com/<your-user>/AI-Apache-POI-ZipBomb-Checker.git
+cd AI-Apache-POI-ZipBomb-Checker
 
-# 2. Copy all provided files here:
-#    - pom.xml
-#    - setup.sh
-#    - All Java files
-
-# 3. Run setup
+# 2. Run setup
 chmod +x setup.sh
 bash setup.sh
 
-# 4. Test
-java -jar target/zipbomb-evaluator-1.0.0-standalone.jar --help
+# 3. Test with included sample files
+java -jar target/zipbomb-evaluator-1.0.0-standalone.jar ./testfiles/*
 ```
 
 ### On Windows:
 ```bash
-# 1. Create and navigate to project directory
-mkdir zipbomb-evaluator && cd zipbomb-evaluator
+# 1. Clone the repo
+git clone https://github.com/<your-user>/AI-Apache-POI-ZipBomb-Checker.git
+cd AI-Apache-POI-ZipBomb-Checker
 
-# 2. Copy all provided files here:
-#    - pom.xml
-#    - setup.bat
-#    - All Java files
-
-# 3. Run setup
+# 2. Run setup
 setup.bat
 
-# 4. Test
-java -jar target\zipbomb-evaluator-1.0.0-standalone.jar --help
+# 3. Test with included sample files
+java -jar target\zipbomb-evaluator-1.0.0-standalone.jar testfiles\*
 ```
 
 ---
 
 ## Step-by-Step Instructions
 
-### Step 1: Download and Organize Files
-
-You should have received these files:
-
-| File | Purpose |
-|------|---------|
-| `pom.xml` | Maven configuration (ROOT) |
-| `setup.sh` | Auto-setup for Linux/macOS |
-| `setup.bat` | Auto-setup for Windows |
-| `ZipBombEvaluator.java` | Core utility |
-| `ZipBombEvaluatorMain.java` | Executable entry point |
-| `DocumentIndexerSecurityFilter.java` | Integration helper |
-| `ZipBombEvaluatorTest_Corrected.java` | Test suite |
-| `DocumentIndexer_Modified_Example.java` | Reference (WSO2 integration) |
-| `SETUP_GUIDE.md` | Detailed setup instructions |
-| `README.md` | Full documentation |
-
-### Step 2: Create Project Directory
+### Step 1: Clone or Download
 
 ```bash
-# Create a clean directory for your project
-mkdir -p ~/projects/zipbomb-evaluator
-cd ~/projects/zipbomb-evaluator
+git clone https://github.com/<your-user>/AI-Apache-POI-ZipBomb-Checker.git
+cd AI-Apache-POI-ZipBomb-Checker
 ```
 
-### Step 3: Place All Files
+Or download and extract the ZIP from GitHub.
 
-Copy/move all the files from your downloads into this directory. After this, your directory should look like:
+### Step 2: Verify What You Have
+
+Your directory should contain:
 
 ```
-zipbomb-evaluator/
+AI-Apache-POI-ZipBomb-Checker/
 ├── pom.xml
-├── setup.sh (or setup.bat on Windows)
-├── ZipBombEvaluator.java
-├── ZipBombEvaluatorMain.java
-├── DocumentIndexerSecurityFilter.java
-├── ZipBombEvaluatorTest_Corrected.java
-├── DocumentIndexer_Modified_Example.java
+├── setup.sh / setup.bat
+├── LICENSE
+├── testfiles/
+│   ├── test-zipbomb.xlsx
+│   ├── testzipbomb.zip
+│   └── admin-PizzaShackAPI-1.0.0.zip
+├── src/
+│   ├── main/java/.../
+│   ├── main/resources/commons-logging.properties
+│   └── test/java/.../
+├── README.md
+├── QUICK_START.md
 ├── SETUP_GUIDE.md
-└── README.md
+└── FILE_MANIFEST.md
 ```
 
-### Step 4: Run Automated Setup
+### Step 3: Run Automated Setup
 
 The setup script will:
 1. ✓ Check Java version (17+)
 2. ✓ Check Maven version (3.8.1+)
-3. ✓ Create all directories
-4. ✓ Ask you to confirm files are in place
-5. ✓ Build the project
-6. ✓ Create JAR files
+3. ✓ Verify directory structure
+4. ✓ Build the project
+5. ✓ Create JAR files
 
 #### Linux/macOS:
 ```bash
@@ -104,9 +85,7 @@ bash setup.sh
 setup.bat
 ```
 
-### Step 5: Verify Installation
-
-After setup completes, test the application:
+### Step 4: Verify Installation
 
 ```bash
 # Show help
@@ -116,17 +95,25 @@ java -jar target/zipbomb-evaluator-1.0.0-standalone.jar --help
 java -jar target/zipbomb-evaluator-1.0.0-standalone.jar --version
 ```
 
-### Step 6: Test with Sample File
+### Step 5: Test with Included Sample Files
 
 ```bash
-# Create a test file
-echo "test content" > test.txt
+java -jar target/zipbomb-evaluator-1.0.0-standalone.jar ./testfiles/*
+```
 
-# Evaluate it
-java -jar target/zipbomb-evaluator-1.0.0-standalone.jar test.txt
+Expected results:
+- `admin-PizzaShackAPI-1.0.0.zip` → **PASSED** (clean file)
+- `test-zipbomb.xlsx` → **ZIP BOMB DETECTED** (335:1 compression ratio)
+- `testzipbomb.zip` → **ZIP BOMB DETECTED** (nested - contains test-zipbomb.xlsx inside)
 
-# Expected output:
-# ✓ test.txt (14 bytes) - PASSED
+### Step 6: Test with Your Own Files
+
+```bash
+# Single file
+java -jar target/zipbomb-evaluator-1.0.0-standalone.jar /path/to/your/file.xlsx
+
+# Multiple files
+java -jar target/zipbomb-evaluator-1.0.0-standalone.jar file1.xlsx file2.docx archive.zip
 ```
 
 ---
@@ -175,6 +162,9 @@ mvn clean compile
 ### Method 1: Standalone JAR (Easiest)
 
 ```bash
+# Test files included in repo
+java -jar target/zipbomb-evaluator-1.0.0-standalone.jar ./testfiles/*
+
 # Single file
 java -jar target/zipbomb-evaluator-1.0.0-standalone.jar document.xlsx
 
@@ -291,7 +281,7 @@ find . -name "*.java" -type f
 # Should show paths matching package names
 # E.g.: ./src/main/java/org/wso2/carbon/apimgt/impl/indexing/util/ZipBombEvaluator.java
 
-# If not, move files to correct locations per SETUP_GUIDE.md
+# If not, re-clone the repo or move files to correct locations per SETUP_GUIDE.md
 ```
 
 ### "Symbol cannot be resolved"
@@ -308,6 +298,12 @@ mvn clean compile
 # IntelliJ: File > Invalidate Caches > Restart
 ```
 
+### `grep: invalid option -- P` on macOS
+
+**Problem**: Old version of `setup.sh` used GNU grep syntax
+
+**Solution**: Pull the latest `setup.sh` — the `grep -P` has been replaced with `grep -oE` which works on both macOS and Linux.
+
 ---
 
 ## Quick Command Reference
@@ -319,16 +315,12 @@ mvn clean package          # Build and package JAR
 mvn clean install          # Install to local Maven repo
 
 # Running Application
+java -jar target/zipbomb-evaluator-1.0.0-standalone.jar ./testfiles/*
 java -jar target/zipbomb-evaluator-1.0.0-standalone.jar file.xlsx
-java -jar target/*.jar file.xlsx
 
 # Testing
 mvn test                   # Run all tests
-mvn test -Dtest=Test      # Run specific test
-
-# IDE Integration
-mvn idea:idea             # Generate IntelliJ project files
-mvn eclipse:eclipse       # Generate Eclipse project files
+mvn test -Dtest=ZipBombEvaluatorTest  # Run specific test
 
 # Dependencies
 mvn dependency:tree       # Show dependency tree
@@ -357,27 +349,14 @@ target/
 
 ---
 
-## Integration with WSO2
-
-To integrate into your WSO2 API Manager:
-
-1. Copy `ZipBombEvaluator.java` to your WSO2 codebase
-2. Copy `DocumentIndexerSecurityFilter.java` to your WSO2 codebase
-3. Modify your `DocumentIndexer.java` per `DocumentIndexer_Modified_Example.java`
-4. Add the security check in `getIndexedDocument()` method
-5. Deploy and test
-
-See `DocumentIndexer_Modified_Example.java` for exact code changes.
-
----
-
 ## Next Steps
 
-1. ✓ Run setup script
-2. ✓ Verify with `java -jar ... --help`
-3. ✓ Test with sample files
-4. ✓ Integrate into WSO2 (if needed)
-5. ✓ Review README.md for full documentation
+1. ✓ Clone or download the repo
+2. ✓ Run setup script
+3. ✓ Verify with `java -jar ... --help`
+4. ✓ Test with `./testfiles/*`
+5. ✓ Test with your own files
+6. ✓ Review README.md for full documentation
 
 ---
 
@@ -386,7 +365,7 @@ See `DocumentIndexer_Modified_Example.java` for exact code changes.
 If you get stuck:
 
 1. **Read**: SETUP_GUIDE.md (detailed troubleshooting)
-2. **Check**: README.md (comprehensive documentation)
+2. **Read**: README.md (comprehensive documentation)
 3. **Verify**: 
    - Java 17+: `java -version`
    - Maven 3.8.1+: `mvn -version`
@@ -396,36 +375,18 @@ If you get stuck:
 
 ---
 
-## File Sizes & Build Time
-
-- Setup time: ~2-5 minutes (depends on Maven downloads)
-- JAR size: ~15-20 MB (standalone with all dependencies)
-- Build time: ~30-60 seconds
-- Test time: ~10-20 seconds
-
----
-
 ## What This Does
 
 The evaluator:
 - ✓ Detects zip bomb attacks
+- ✓ **Recursively inspects nested archives** (zip inside zip, xlsx inside zip)
 - ✓ Checks compression ratios
 - ✓ Validates file sizes
 - ✓ Analyzes Office documents (XLSX, DOCX, PPTX, XLS, DOC, PPT)
 - ✓ Analyzes PDFs and archives
-- ✓ Provides detailed diagnostics
+- ✓ Provides detailed diagnostics with nesting path
 - ✓ Safe resource cleanup
 - ✓ Production-ready logging
-
----
-
-## Support Files
-
-You also have:
-- **README.md** - Full API documentation
-- **SETUP_GUIDE.md** - Detailed setup instructions
-- **DocumentIndexer_Modified_Example.java** - How to integrate with WSO2
-- **ZipBombEvaluatorTest_Corrected.java** - Test examples
 
 ---
 

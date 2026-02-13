@@ -5,23 +5,28 @@ A standalone utility for detecting zip bomb attacks in document files processed 
 ## Features
 
 - Detects zip bombs across multiple file formats
+- **Recursive inspection** of nested archives (zip containing xlsx, zip within zip, etc.)
 - Checks compression ratios, entry sizes, and total archive sizes
 - Supports: XLSX, DOCX, PPTX, XLS, DOC, PPT, PDF, ZIP, JAR, WAR
 - CLI tool with formatted output and exit codes for scripting
 - Standalone fat JAR (no runtime dependencies needed)
-- Production-ready logging via Log4j2
+- Logging via Commons Logging (java.util.logging backend)
 
 ## Quick Start
 
 ```bash
-# 1. Run setup (creates dirs, builds project)
+# 1. Clone and enter the repo
+git clone https://github.com/<your-user>/AI-Apache-POI-ZipBomb-Checker.git
+cd AI-Apache-POI-ZipBomb-Checker
+
+# 2. Run setup (creates dirs, builds project)
 chmod +x setup.sh
 bash setup.sh
 
-# 2. Test it
+# 3. Test it
 java -jar target/zipbomb-evaluator-1.0.0-standalone.jar --help
 
-# 3. Evaluate files in a folder
+# 4. Evaluate files in a folder
 java -jar target/zipbomb-evaluator-1.0.0-standalone.jar ./testfiles/*
 ```
 
@@ -43,6 +48,9 @@ java -jar target/zipbomb-evaluator-1.0.0-standalone.jar document.xlsx
 
 # Multiple files
 java -jar target/zipbomb-evaluator-1.0.0-standalone.jar file1.xlsx file2.docx archive.zip
+
+# All test files
+java -jar target/zipbomb-evaluator-1.0.0-standalone.jar ./testfiles/*
 
 # Help
 java -jar target/zipbomb-evaluator-1.0.0-standalone.jar --help
@@ -93,15 +101,19 @@ try {
 | Compression Ratio | 100:1 |
 | Max Entry Size | 1 GB |
 | Max Total Uncompressed Size | 10 GB |
+| Max Recursion Depth | 10 nesting levels |
+| Max Extraction Size | 100 MB per nested entry |
 
 ## What It Detects
 
 - Excessive compression ratios (classic zip bombs)
+- **Nested zip bombs** (e.g., a zip containing a malicious xlsx)
 - Oversized individual archive entries
 - Total archive size violations
 - Malformed or corrupted zip structures
 - Corrupted Office documents that trigger POI exceptions
 - Format mismatches (e.g., DOCX file with .xls extension)
+- Excessive archive nesting depth (recursive zip bombs)
 
 ## Supported File Formats
 
@@ -114,38 +126,39 @@ try {
 | DOC | Microsoft Word 2003 | POI OLE2 analysis |
 | PPT | Microsoft PowerPoint 2003 | POI OLE2 analysis |
 | PDF | Adobe PDF | PDFBox 3.x analysis |
-| ZIP | Standard archive | Zip structure analysis |
-| JAR | Java archive | Zip structure analysis |
-| WAR | Web archive | Zip structure analysis |
+| ZIP | Standard archive | Zip structure + recursive content analysis |
+| JAR | Java archive | Zip structure + recursive content analysis |
+| WAR | Web archive | Zip structure + recursive content analysis |
 
 ## Project Structure
 
 ```
-zipbomb-evaluator/
-├── pom.xml                          # Maven build config
-├── setup.sh                         # Linux/macOS setup
-├── setup.bat                        # Windows setup
+AI-Apache-POI-ZipBomb-Checker/
+├── pom.xml                                  # Maven build config
+├── setup.sh                                 # Linux/macOS setup
+├── setup.bat                                # Windows setup
+├── LICENSE                                  # Apache License 2.0
+├── .gitignore
+├── testfiles/                               # Sample files for testing
+│   ├── test-zipbomb.xlsx                    # Direct zip bomb (335:1 ratio)
+│   ├── testzipbomb.zip                      # Nested zip bomb (xlsx inside zip)
+│   └── admin-PizzaShackAPI-1.0.0.zip       # Clean file (should pass)
 ├── src/
 │   ├── main/java/.../indexing/
 │   │   ├── util/
-│   │   │   └── ZipBombEvaluator.java        # Core detection engine
+│   │   │   └── ZipBombEvaluator.java        # Core detection engine (recursive)
 │   │   ├── ZipBombEvaluatorMain.java        # CLI entry point
 │   │   └── indexer/
 │   │       └── DocumentIndexerSecurityFilter.java  # Integration helper
 │   ├── main/resources/
-│   │   └── log4j2.xml                       # Logging config
+│   │   └── commons-logging.properties       # Logging config (JUL backend)
 │   └── test/java/.../indexing/util/
 │       └── ZipBombEvaluatorTest.java        # Tests & examples
-├── reference/
-│   ├── DocumentIndexer_Modified_Example.java  # WSO2 integration guide
-│   └── DocumentIndexerSecurityFilter_WSO2.java # WSO2-specific version
-├── QUICK_START.md
-├── SETUP_GUIDE.md
-├── README.md                        # This file
-└── FILE_MANIFEST.md
+├── README.md                                # This file
+├── QUICK_START.md                           # 5-minute setup guide
+├── SETUP_GUIDE.md                           # Detailed setup & troubleshooting
+└── FILE_MANIFEST.md                         # Complete file inventory
 ```
-
-
 
 ## Building
 
@@ -231,13 +244,13 @@ Completion Time:        2026-02-12 17:03:47
 | Apache PDFBox | 3.0.1 | PDF processing |
 | Commons IO | 2.15.1 | File utilities |
 | Commons Lang3 | 3.14.0 | String utilities |
-| Log4j2 | 2.22.1 | Logging |
+| Commons Logging | 1.2 | Logging facade (JUL backend) |
 | JUnit 4 | 4.13.2 | Testing |
 
 ## Performance
 
 - Evaluation time: 5-50ms per file (varies by format and size)
-- Standalone JAR size: ~18 MB (includes all dependencies)
+- Standalone JAR size: ~27 MB (includes all dependencies)
 - Build time: 30-60 seconds
 
 ## License
@@ -253,6 +266,6 @@ THIS MAYBE WORKS. I HAVEN'T TESTED IT
 To add zip bomb protection to your WSO2 API Manager DocumentIndexer:
 
 1. Copy `ZipBombEvaluator.java` to your WSO2 project's `indexing/util/` package
-2. Copy the WSO2-specific `DocumentIndexerSecurityFilter` from `reference/`
+2. Copy `DocumentIndexerSecurityFilter.java` to your WSO2 project
 3. Modify `DocumentIndexer.getIndexedDocument()` to add the security check
-4. See `reference/DocumentIndexer_Modified_Example.java` for exact code
+4. Build and deploy

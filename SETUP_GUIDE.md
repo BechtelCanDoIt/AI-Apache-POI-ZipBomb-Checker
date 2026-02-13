@@ -5,26 +5,29 @@
 The Maven project must have this exact structure for compilation:
 
 ```
-zipbomb-evaluator/
+AI-Apache-POI-ZipBomb-Checker/
 ├── pom.xml                                          ← Root (must be here)
 ├── setup.sh / setup.bat                             ← Run from root
+├── LICENSE
+├── .gitignore
+│
+├── testfiles/                                       ← Sample test data
+│   ├── test-zipbomb.xlsx                            ← Direct zip bomb
+│   ├── testzipbomb.zip                              ← Nested zip bomb
+│   └── admin-PizzaShackAPI-1.0.0.zip               ← Clean file (passes)
 │
 ├── src/main/java/org/wso2/carbon/apimgt/impl/indexing/
 │   ├── ZipBombEvaluatorMain.java                    ← CLI entry point
 │   ├── util/
-│   │   └── ZipBombEvaluator.java                    ← Core engine
+│   │   └── ZipBombEvaluator.java                    ← Core engine (recursive)
 │   └── indexer/
 │       └── DocumentIndexerSecurityFilter.java       ← Integration helper
 │
 ├── src/main/resources/
-│   └── log4j2.xml                                   ← Logging config
+│   └── commons-logging.properties                   ← Logging config (JUL)
 │
-├── src/test/java/org/wso2/carbon/apimgt/impl/indexing/util/
-│   └── ZipBombEvaluatorTest.java                    ← Tests
-│
-└── reference/                                       ← NOT compiled
-    ├── DocumentIndexer_Modified_Example.java        ← WSO2 integration guide
-    └── DocumentIndexerSecurityFilter_WSO2.java      ← WSO2-specific version
+└── src/test/java/org/wso2/carbon/apimgt/impl/indexing/util/
+    └── ZipBombEvaluatorTest.java                    ← Tests
 ```
 
 **Critical**: Java package declarations MUST match directory paths exactly.
@@ -35,18 +38,18 @@ The recommended approach is to use the setup script:
 
 ### Linux/macOS
 ```bash
-cd zipbomb-evaluator
+cd AI-Apache-POI-ZipBomb-Checker
 chmod +x setup.sh
 bash setup.sh
 ```
 
 ### Windows
 ```cmd
-cd zipbomb-evaluator
+cd AI-Apache-POI-ZipBomb-Checker
 setup.bat
 ```
 
-The script will create all directories, copy files to correct locations, verify prerequisites, and build the project.
+The script will verify prerequisites, check directory structure, and build the project.
 
 ## Manual Setup
 
@@ -58,7 +61,6 @@ mkdir -p src/main/java/org/wso2/carbon/apimgt/impl/indexing/util
 mkdir -p src/main/java/org/wso2/carbon/apimgt/impl/indexing/indexer
 mkdir -p src/test/java/org/wso2/carbon/apimgt/impl/indexing/util
 mkdir -p src/main/resources
-mkdir -p reference
 ```
 
 ### Step 2: Place files
@@ -125,6 +127,9 @@ export PATH=$JAVA_HOME/bin:$PATH
 ### Build succeeds but no standalone JAR
 The shade plugin runs during the `package` phase. Use `mvn clean package` (not just `compile`).
 
+### `grep: invalid option -- P` on macOS
+The latest `setup.sh` uses `grep -oE` instead of `grep -P`. Make sure you have the latest version from the repo.
+
 ## Verification Checklist
 
 After setup, verify everything works:
@@ -143,12 +148,12 @@ mvn clean compile        # Should succeed with 0 errors
 mvn test                 # Should run and pass
 
 # 5. JAR exists
-ls -lh target/*standalone*.jar   # Should show ~18MB JAR
+ls -lh target/*standalone*.jar   # Should show ~27MB JAR
 
 # 6. CLI works
 java -jar target/zipbomb-evaluator-1.0.0-standalone.jar --help
 
-# 7. Evaluate a test file
-echo "test" > /tmp/test.txt
-java -jar target/zipbomb-evaluator-1.0.0-standalone.jar /tmp/test.txt
+# 7. Evaluate test files
+java -jar target/zipbomb-evaluator-1.0.0-standalone.jar ./testfiles/*
+# Expected: 1 pass, 2 threats (direct bomb + nested bomb)
 ```
