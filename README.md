@@ -16,7 +16,7 @@ A standalone utility for detecting zip bomb attacks in document files processed 
 
 ```bash
 # 1. Clone and enter the repo
-git clone https://github.com/<your-user>/AI-Apache-POI-ZipBomb-Checker.git
+git clone https://github.com/BechtelCanDoIt/AI-Apache-POI-ZipBomb-Checker.git
 cd AI-Apache-POI-ZipBomb-Checker
 
 # 2. Run setup (creates dirs, builds project)
