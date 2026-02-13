@@ -1,6 +1,11 @@
+# Source Code
+This source code is AI generated.
+
+---
+
 # ZipBomb Evaluator
 
-A standalone utility for detecting zip bomb attacks in document files processed by Apache POI and PDFBox. Designed for integration with WSO2 API Manager's document indexing pipeline, but works as a standalone CLI tool.
+A standalone utility for detecting zip bomb attacks in document files processed by Apache POI as a standalone CLI tool.
 
 ## Features
 
